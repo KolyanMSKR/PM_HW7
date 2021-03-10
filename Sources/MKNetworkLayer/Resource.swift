@@ -16,8 +16,8 @@ public struct Resource {
 
     public init(baseURL: URL,
                 headers: [String: String],
-                httpBody: Data?,
-                httpMethod: HTTPMethod = .get) {
+                httpMethod: HTTPMethod = .get,
+                httpBody: Data? = nil) {
 
         self.baseURL = baseURL
         self.httpMethod = httpMethod
