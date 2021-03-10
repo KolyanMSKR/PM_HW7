@@ -3,7 +3,8 @@ import Foundation
 public final class NetworkService {
 
     private let resource: Resource
-    private var successStatusCodes: Range<Int>
+    private var successStatusCodes: Range<Int> = 200..<300
+    private var defaultHTTPHeaders = [String: String]()
 
     private lazy var request: URLRequest = {
         var request = URLRequest(url: resource.baseURL)
@@ -14,37 +15,38 @@ public final class NetworkService {
         return request
     }()
 
-    init(resource: Resource,
-        successStatusCodes: Range<Int> = StatusCodes.success.value) {
+    public init(defaultHTTPHeaders: [String: String],
+                resource: Resource) {
 
+        self.defaultHTTPHeaders = defaultHTTPHeaders
         self.resource = resource
-        self.successStatusCodes = successStatusCodes
+    }
+
+    public func changeStatusCodes(on range: Range<Int>) {
+        self.successStatusCodes = range
     }
 
     private func createDataTask(request: URLRequest, completion: @escaping (Result<Data, NetworkError>) -> ()) {
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             if error != nil {
                 completion(.failure(.dataTaskError))
-
                 return
             }
 
             guard let data = data else {
                 completion(.failure(.invalidData))
-
                 return
             }
 
             guard let responseStatusCode = (response as? HTTPURLResponse)?.statusCode else {
                 completion(.failure(.invalidResponseStatusCode))
-
                 return
             }
 
             guard let successStatusCodes = self?.successStatusCodes,
                 successStatusCodes.contains(responseStatusCode) else {
-                completion(.failure(.failureStatusCode))
 
+                completion(.failure(.failureStatusCode))
                 return
             }
 

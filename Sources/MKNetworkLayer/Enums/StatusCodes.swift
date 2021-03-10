@@ -11,7 +11,7 @@ enum StatusCodes {
     case success
     case fail
 
-    var value: Range<Int> {
+    public var value: Range<Int> {
         switch self {
         case .success:
             return 200..<300
